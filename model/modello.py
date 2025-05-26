@@ -5,8 +5,8 @@ import networkx as nx
 
 from model.sighting import Sighting
 
-
 class Model:
+
     def __init__(self):
         self._grafo = nx.DiGraph()
         self._nodes = []
