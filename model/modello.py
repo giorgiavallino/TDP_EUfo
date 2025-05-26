@@ -63,7 +63,12 @@ class Model:
     def _ricorsione(self, soluzione_parziale, nodi_rimanenti):
         # Caso terminale --> quando non si possono più aggiungere nodi
         if len(nodi_rimanenti) == 0:
-            print(soluzione_parziale)
+            punteggio = self.calcola_punteggio(soluzione_parziale)
+            if punteggio > self._score_ottimo:
+                self._score_ottimo = punteggio
+                self._cammino_ottimo = copy.deepcopy(soluzione_parziale)
+            print(self._cammino_ottimo)
+            print(self._score_ottimo)
         # Caso ricorsivo:
         else:
             # per ogni nodo rimanente, bisogna:
@@ -77,15 +82,23 @@ class Model:
                 # 4. fare il backtracking
                 soluzione_parziale.pop()
 
-
-    def calcola_punteggio(self, parziale):
-        pass
+    def calcola_punteggio(self, soluzione_parziale):
+        punteggio = 0
+        # Termine fisso
+        punteggio = punteggio + (100*len(soluzione_parziale))
+        # Termine variabile
+        for i in range(1, len(soluzione_parziale)):
+            nodo = soluzione_parziale[i]
+            nodo_precedente = soluzione_parziale[i-1]
+            if nodo.datetime.month == nodo_precedente.datetime.month:
+                punteggio = punteggio + 200
+        return punteggio
 
     def calcola_rimanenti(self, soluzione_parziale): # --> calcola i nodi rimanenti rispetto al nodo che si sta
     # visitando
         nuovi_rimanenti = []
         for i in self._grafo.successors(soluzione_parziale[-1]): # --> prende i nodi successivi
-            # presi i nodi, bisogna verificare il vincolo sul mese: non ci possono essere più di tre avvistamenti per
+            # Presi i nodi, bisogna verificare il vincolo sul mese: non ci possono essere più di tre avvistamenti per
             # uno stesso mese... e il vincolo sulla durata: la durata degli avvistamenti deve essere crescente
             if self.is_vincolo_ok(soluzione_parziale, i) and self.is_vincolo_durata_ok(soluzione_parziale, i):
                 nuovi_rimanenti.append(i)
